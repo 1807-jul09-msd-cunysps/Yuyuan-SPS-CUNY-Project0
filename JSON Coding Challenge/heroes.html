@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>Our superheroes</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Faster+One" rel="stylesheet"> 
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+
+      <header>
+
+      </header>
+
+      <section>
+
+      </section>
+
+    <script>
+		var header = document.querySelector('header');
+		var section = document.querySelector('section');
+		var requestURL = 'https://mdn.github.io/learning-area/javascript/oojs/json/superheroes.json';
+		var request = new XMLHttpRequest();
+		request.open('GET', requestURL);
+		request.responseType = 'json';
+		request.send();
+		request.onload = function() {
+			var superHeroes = request.response;
+			populateHeader(superHeroes);
+			showHeroes(superHeroes);
+		}
+		
+		function populateHeader(s) {
+			var title = document.createElement('h1');
+			title.innerText = s.squadName;
+			var description = document.createElement('p');
+			description.innerText = 'Hometown: ' + s.homeTown + ' // ' + 'Formed: ' + s.formed;
+			header.appendChild(title);
+			header.appendChild(description);
+		}
+
+		function showHeroes(s) {
+			for (var i = 0; i < 3; i++) {
+				var col = document.createElement('article');
+				var name = document.createElement('h2');
+				name.innerText = s.members[0].name;
+				var secretId = document.createElement('p');
+				secretId.innerText = 'Secret identity: ' + s.members[0].secretIdentity;
+				var age = document.createElement('p');
+				age.innerText = 'Age: ' + s.members[0].age;
+				var powerLabel = document.createElement('p');
+				powerLabel.innerText = 'Superpowers: ';
+				var powerList = document.createElement('ul');
+				for (var j = 0; j < s.members[0].powers.length; j++) {
+					var power = document.createElement('li');
+					power.innerText = s.members[0].powers[j];
+					powerList.appendChild(power);
+				}
+				col.appendChild(name);
+				col.appendChild(secretId);
+				col.appendChild(age);
+				col.appendChild(powerLabel);
+				col.appendChild(powerList);
+				section.appendChild(col);
+			}
+		}
+    </script>
+  </body>
+</html>
