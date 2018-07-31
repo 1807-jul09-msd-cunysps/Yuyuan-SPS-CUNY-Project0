@@ -13,7 +13,6 @@ C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\ContactClie
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\ContactClient.exe
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\ContactClient.pdb
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\ContactLibrary.dll
-C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\NLog.dll
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\ContactLibrary.pdb
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\NLog.xml
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\obj\Debug\ContactClient.csprojAssemblyReference.cache
