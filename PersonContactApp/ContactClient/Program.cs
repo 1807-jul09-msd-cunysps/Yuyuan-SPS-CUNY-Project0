@@ -76,7 +76,7 @@ namespace ContactClient
                     }
                     catch (Exception e)
                     {
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                         if (option == 1)
                             Console.WriteLine("Error occured while attempting to deserialize the existing file." + Environment.NewLine);
                         else
@@ -183,7 +183,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Add operation failed!");
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                     }
                     break;
                 case "2": // read
@@ -203,7 +203,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Read operation failed!");
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                     }
                     break;
                 case "3": // delete
@@ -222,7 +222,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Delete operation failed!");
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                     }
                     break;
                 case "4": // update
@@ -248,7 +248,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Update operation failed!");
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                     }
                     break;
                 case "5": // search
@@ -279,7 +279,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Search operation failed!");
-                        cd.logger.Info(e.StackTrace);
+                        cd.logger.Error(e.StackTrace);
                     }
                     break;
                 case "6": // show all contacts

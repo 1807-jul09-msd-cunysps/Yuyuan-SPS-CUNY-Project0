@@ -53,7 +53,7 @@ namespace ContactLibrary
             }
             catch (Exception e)
             {
-                logger.Info(e.StackTrace);
+                logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while inserting values.");
             }
         }
@@ -108,7 +108,7 @@ namespace ContactLibrary
             }
             catch (Exception e)
             {
-                logger.Info(e.StackTrace);
+                logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while deleting the entry.");
             }
         }
@@ -165,7 +165,7 @@ namespace ContactLibrary
             }
             catch (Exception e)
             {
-                logger.Info(e.StackTrace);
+                logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while updating the entry.");
             }
         }
@@ -306,7 +306,7 @@ namespace ContactLibrary
             }
             catch (Exception e)
             {
-                logger.Info(e.StackTrace);
+                logger.Error(e.StackTrace);
                 Console.WriteLine("Error clearing database entries.");
             }
         }
@@ -332,7 +332,7 @@ namespace ContactLibrary
 
         public DbHandler()
         {
-            con = new SqlConnection("Data Source=chancunysps.database.windows.net;Initial Catalog=TestDb;Persist Security Info=True;User ID=cyy5113;Password=Password12345");
+            con = new SqlConnection("Data Source=chancunysps.database.windows.net;Initial Catalog=TestDb;Persist Security Error=True;User ID=cyy5113;Password=Password12345");
             con.Open();
             cmd = new SqlCommand("", con);
         }
