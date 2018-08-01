@@ -20,3 +20,4 @@ C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\obj\Debug\ContactClie
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\obj\Debug\ContactClient.csproj.CopyComplete
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\obj\Debug\ContactClient.exe
 C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\obj\Debug\ContactClient.pdb
+C:\Users\yuyua\source\repos\PersonContactApp\ContactClient\bin\Debug\NLog.dll

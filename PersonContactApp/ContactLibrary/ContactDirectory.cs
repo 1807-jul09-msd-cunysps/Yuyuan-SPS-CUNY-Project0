@@ -16,7 +16,7 @@ namespace ContactLibrary
         public ICollection<Person> People { get; set; } // can be any generic collection, I am using list
         // other data members
         public DbHandler db = null; // for handling sql objects
-        public NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger(); // for logging exceptions
+        private NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger(); // for logging exceptions
         public static readonly string PrettyFormat = "{0,4} {1,15} {2,15} {3,8} {4,20} {5,20} {6,20} {7,20} {8,7} {9,15} {10,15} {11,12} {12,5}";
 
         public ContactDirectory()
@@ -42,19 +42,24 @@ namespace ContactLibrary
 
         public void AddPersonToDatabase(Person p)
         {
-            try
-            {
-                db.cmd.CommandText = $"insert into dbo.Person (Pid, FirstName, LastName) values ({p.Pid}, '{p.FirstName}', '{p.LastName}') "
+            db.cmd.CommandText = $"insert into dbo.Person (Pid, FirstName, LastName) values ({p.Pid}, '{p.FirstName}', '{p.LastName}') "
                     + "insert into dbo.Address (Pid, HouseNum, Street, City, State, Country, ZipCode) values "
                     + $"({p.Address.Pid}, '{p.Address.HouseNum}', '{p.Address.Street}', '{p.Address.City}', '{p.Address.State}', '{p.Address.Country}', '{p.Address.ZipCode}') "
-                    + $"insert into dbo.Phone (Pid, CountryCode, AreaCode, PhoneNumber, Extension) values "
+                    + $"insert into dbo.Phone (Pid, CountryCode, AreaCode, Number, Ext) values "
                     + $"({p.Phone.Pid}, '{p.Phone.CountryCode}', '{p.Phone.AreaCode}', '{p.Phone.Number}', '{p.Phone.Ext}')";
+            try
+            {
+                db.con.Open();
                 db.cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while inserting values.");
+            }
+            finally
+            {
+                db.con.Close();
             }
         }
 
@@ -74,22 +79,36 @@ namespace ContactLibrary
 
         public string ReadPersonFromDatabase(long Pid)
         {
-            db.cmd.CommandText = "select per.Pid, FirstName, LastName, HouseNum, Street, City, State, Country, ZipCode, CountryCode, AreaCode, PhoneNumber, Extension " +
+            db.cmd.CommandText = "select per.Pid, FirstName, LastName, HouseNum, Street, City, State, Country, ZipCode, CountryCode, AreaCode, Number, Ext " +
                 "from dbo.Person as per inner join dbo.Address as addr on per.Pid = addr.Pid inner join dbo.Phone as pho on per.Pid = pho.Pid " +
                 $"where per.Pid = {Pid}";
-            db.reader = db.cmd.ExecuteReader();
             string result = "";
-            if (db.reader.Read())
+            try
             {
-                result = string.Format(PrettyFormat,
-                            db.reader[0], db.reader[1], db.reader[2], db.reader[3], db.reader[4], db.reader[5], db.reader[6], db.reader[7], db.reader[8], db.reader[9], db.reader[10], db.reader[11], db.reader[12]);
+                db.con.Open();
+                db.reader = db.cmd.ExecuteReader();
+                if (db.reader.Read())
+                {
+                    result = string.Format(PrettyFormat,
+                                db.reader[0], db.reader[1], db.reader[2], db.reader[3], db.reader[4], db.reader[5], db.reader[6], db.reader[7], db.reader[8], db.reader[9], db.reader[10], db.reader[11], db.reader[12]);
+                }
+                else
+                {
+                    Console.WriteLine($"Person with Pid {Pid} does not exist!");
+                }
+                db.reader.Close();
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                Console.WriteLine($"Person with Pid {Pid} does not exist!");
+                logger.Error(e.StackTrace);
+                Console.WriteLine("Error occured while reading the entry.");
+                return result;
             }
-            db.reader.Close();
-            return result;
+            finally
+            {
+                db.con.Close();
+            }
         }
 
         public void DeletePerson(long Pid)
@@ -104,12 +123,17 @@ namespace ContactLibrary
             db.cmd.CommandText = $"delete from dbo.Person where Pid = {Pid}";
             try
             {
+                db.con.Open();
                 db.cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while deleting the entry.");
+            }
+            finally
+            {
+                db.con.Close();
             }
         }
 
@@ -161,12 +185,17 @@ namespace ContactLibrary
             db.cmd.CommandText += $" set {PropertyMap[property]} = '{val}' where Pid = {Pid}";
             try
             {
+                db.con.Open();
                 db.cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 logger.Error(e.StackTrace);
                 Console.WriteLine("Error occured while updating the entry.");
+            }
+            finally
+            {
+                db.con.Close();
             }
         }
 
@@ -202,10 +231,10 @@ namespace ContactLibrary
                 case 5:
                     query =
                         from person in People
-                        let phoneNumber = person.Phone.CountryCode +
+                        let pnum = person.Phone.CountryCode +
                             person.Phone.AreaCode +
                             person.Phone.Number
-                        where phoneNumber.Contains(val)
+                        where pnum.Contains(val)
                         select person;
                     break;
                 default:
@@ -217,9 +246,10 @@ namespace ContactLibrary
 
         public string SearchPersonInDatabase(int property, string val)
         {
+            string result = "";
             db.cmd.CommandText = "select per.Pid, FirstName, LastName, " +
                 "HouseNum, Street, City, State, Country, ZipCode, " +
-                "CountryCode, AreaCode, PhoneNumber, Extension " +
+                "CountryCode, AreaCode, Number, Ext " +
                 "from dbo.Person as per inner join dbo.Address as addr on per.Pid = addr.Pid " +
                 "inner join dbo.Phone as pho on per.Pid = pho.Pid ";
             switch (property)
@@ -237,22 +267,35 @@ namespace ContactLibrary
                     db.cmd.CommandText += $"where {PropertyMap[property]} like '%{val}%'";
                     break;
                 case 5: // full phone number
-                    db.cmd.CommandText += $"where concat(CountryCode, AreaCode, PhoneNumber) like '%{val}%'";
+                    db.cmd.CommandText += $"where concat(CountryCode, AreaCode, Number) like '%{val}%'";
                     break;
                 default:
                     Console.WriteLine("Invalid choice selected. No such property.");
                     return null;
             }
-            string result = "";
-            db.reader = db.cmd.ExecuteReader();
-            while (db.reader.Read())
+            try
             {
-                result += string.Format(PrettyFormat,
-                            db.reader[0], db.reader[1], db.reader[2], db.reader[3], db.reader[4], db.reader[5], db.reader[6], db.reader[7], db.reader[8], db.reader[9], db.reader[10], db.reader[11], db.reader[12]);
-                result += Environment.NewLine;
+                db.con.Open();
+                db.reader = db.cmd.ExecuteReader();
+                while (db.reader.Read())
+                {
+                    result += string.Format(PrettyFormat,
+                                db.reader[0], db.reader[1], db.reader[2], db.reader[3], db.reader[4], db.reader[5], db.reader[6], db.reader[7], db.reader[8], db.reader[9], db.reader[10], db.reader[11], db.reader[12]);
+                    result += Environment.NewLine;
+                }
+                db.reader.Close();
+                return result.TrimEnd('\t', '\n', '\r', ' ');
             }
-            db.reader.Close();
-            return result.TrimEnd('\t', '\n', '\r', ' ');
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+                Console.WriteLine("Error occured while searching for entries.");
+                return result;
+            }
+            finally
+            {
+                db.con.Close();
+            }
         }
 
         public void ShowAllPerson()
@@ -272,29 +315,42 @@ namespace ContactLibrary
 
         public void LoadDatabaseEntries()
         {
-            db.cmd.CommandText = "select per.Pid, FirstName, LastName, HouseNum, Street, City, State, Country, ZipCode, CountryCode, AreaCode, PhoneNumber, Extension " +
-                    "from dbo.Person as per inner join dbo.Address as addr on per.Pid = addr.Pid inner join dbo.Phone as pho on per.Pid = pho.Pid " +
-                    "order by per.Pid";
-            db.reader = db.cmd.ExecuteReader();
-            while (db.reader.Read())
+            db.cmd.CommandText = "select per.Pid, FirstName, LastName, HouseNum, Street, City, State, Country, ZipCode, CountryCode, AreaCode, Number, Ext " +
+                "from dbo.Person as per inner join dbo.Address as addr on per.Pid = addr.Pid inner join dbo.Phone as pho on per.Pid = pho.Pid " +
+                "order by per.Pid";
+            try
             {
-                Person p = new Person();
-                p.Pid = p.Address.Pid = p.Phone.Pid = (long)db.reader[0];
-                p.FirstName = (string)db.reader[1];
-                p.LastName = (string)db.reader[2];
-                p.Address.HouseNum = (string)db.reader[3];
-                p.Address.Street = (string)db.reader[4];
-                p.Address.City = (string)db.reader[5];
-                p.Address.State = (string)db.reader[6];
-                p.Address.Country = (string)db.reader[7];
-                p.Address.ZipCode = (string)db.reader[8];
-                p.Phone.CountryCode = (string)db.reader[9];
-                p.Phone.AreaCode = (string)db.reader[10];
-                p.Phone.Number = (string)db.reader[11];
-                p.Phone.Ext = (string)db.reader[12];
-                AddPerson(p);
+                db.con.Open();
+                db.reader = db.cmd.ExecuteReader();
+                while (db.reader.Read())
+                {
+                    Person p = new Person();
+                    p.Pid = p.Address.Pid = p.Phone.Pid = (long)db.reader[0];
+                    p.FirstName = (string)db.reader[1];
+                    p.LastName = (string)db.reader[2];
+                    p.Address.HouseNum = (string)db.reader[3];
+                    p.Address.Street = (string)db.reader[4];
+                    p.Address.City = (string)db.reader[5];
+                    p.Address.State = (string)db.reader[6];
+                    p.Address.Country = (string)db.reader[7];
+                    p.Address.ZipCode = (string)db.reader[8];
+                    p.Phone.CountryCode = (string)db.reader[9];
+                    p.Phone.AreaCode = (string)db.reader[10];
+                    p.Phone.Number = (string)db.reader[11];
+                    p.Phone.Ext = (string)db.reader[12];
+                    AddPerson(p);
+                }
+                db.reader.Close();
             }
-            db.reader.Close();
+            catch (Exception e)
+            {
+                logger.Error(e.StackTrace);
+                Console.WriteLine(e.Message + "Error loading database entries.");
+            }
+            finally
+            {
+                db.con.Close();
+            }
         }
 
         public void ClearDatabaseEntries() // for deleting every entry in database
@@ -302,12 +358,17 @@ namespace ContactLibrary
             db.cmd.CommandText = "delete dbo.Person delete dbo.Address delete dbo.Phone";
             try
             {
+                db.con.Open();
                 db.cmd.ExecuteNonQuery();
             }
             catch (Exception e)
             {
                 logger.Error(e.StackTrace);
                 Console.WriteLine("Error clearing database entries.");
+            }
+            finally
+            {
+                db.con.Close();
             }
         }
 
@@ -332,8 +393,7 @@ namespace ContactLibrary
 
         public DbHandler()
         {
-            con = new SqlConnection("Data Source=chancunysps.database.windows.net;Initial Catalog=TestDb;Persist Security Error=True;User ID=cyy5113;Password=Password12345");
-            con.Open();
+            con = new SqlConnection("Data Source=chancunysps.database.windows.net;Initial Catalog=TestDb;Persist Security Info=True;User ID=cyy5113;Password=Password12345");
             cmd = new SqlCommand("", con);
         }
     }
@@ -349,6 +409,7 @@ namespace ContactLibrary
             ms.Close();
             return jsonString;
         }
+
         public static T JsonDeserializer<T>(string jsonString)
         {
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
@@ -356,10 +417,5 @@ namespace ContactLibrary
             T obj = (T)ser.ReadObject(ms);
             return obj;
         }
-    }
-
-    public class MyLogger
-    {
-        public static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
     }
 }

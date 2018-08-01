@@ -9,6 +9,7 @@ namespace ContactClient
     {
         private static string fileName = "example.txt"; // default file name for option 2
         private static ContactDirectory cd = null;
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args)
         {
@@ -76,7 +77,7 @@ namespace ContactClient
                     }
                     catch (Exception e)
                     {
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                         if (option == 1)
                             Console.WriteLine("Error occured while attempting to deserialize the existing file." + Environment.NewLine);
                         else
@@ -85,8 +86,6 @@ namespace ContactClient
                     }
                     break;
                 case "3": // exit app
-                    if (option == 2 && cd.db.con != null)
-                        cd.db.con.Close();
                     Environment.Exit(0);
                     break;
                 default: // invalid arg
@@ -183,17 +182,21 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Add operation failed!");
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                     }
                     break;
                 case "2": // read
                     try
                     {
-                        do
-                        {
-                            Console.Write("Specify the Pid: ");
-                            b = Int64.TryParse(Console.ReadLine(), out i);
-                        } while (!b);
+                        //do
+                        //{
+                        //    Console.Write("Specify the Pid: ");
+                        //    b = Int64.TryParse(Console.ReadLine(), out i);
+                        //} while (!b);
+                        Console.Write("Specify the Pid: ");
+                        b = Int64.TryParse(Console.ReadLine(), out i);
+                        if (!b)
+                            break;
                         cd.PrintLegend();
                         if (option == 1)
                             Console.WriteLine(cd.ReadPerson(i).ToString());
@@ -203,17 +206,21 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Read operation failed!");
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                     }
                     break;
                 case "3": // delete
                     try
                     {
-                        do
-                        {
-                            Console.Write("Specify the Pid: ");
-                            b = Int64.TryParse(Console.ReadLine(), out i);
-                        } while (!b || cd.ReadPerson(i) == null);
+                        //do
+                        //{
+                        //    Console.Write("Specify the Pid: ");
+                        //    b = Int64.TryParse(Console.ReadLine(), out i);
+                        //} while (!b || cd.ReadPerson(i) == null);
+                        Console.Write("Specify the Pid: ");
+                        b = Int64.TryParse(Console.ReadLine(), out i);
+                        if (!b || cd.ReadPerson(i) == null)
+                            break;
                         cd.DeletePerson(i);
                         File.WriteAllText(fileName, JsonHelper.JsonSerializer(cd));
                         if (option == 2)
@@ -222,17 +229,21 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Delete operation failed!");
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                     }
                     break;
                 case "4": // update
                     try
                     {
-                        do
-                        {
-                            Console.Write("Specify the Pid: ");
-                            b = Int64.TryParse(Console.ReadLine(), out i);
-                        } while (!b || cd.ReadPerson(i) == null);
+                        //do
+                        //{
+                        //    Console.Write("Specify the Pid: ");
+                        //    b = Int64.TryParse(Console.ReadLine(), out i);
+                        //} while (!b || cd.ReadPerson(i) == null);
+                        Console.Write("Specify the Pid: ");
+                        b = Int64.TryParse(Console.ReadLine(), out i);
+                        if (!b || cd.ReadPerson(i) == null)
+                            break;
                         ShowUpdatePrompt();
                         do
                         {
@@ -248,7 +259,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Update operation failed!");
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                     }
                     break;
                 case "5": // search
@@ -260,7 +271,7 @@ namespace ContactClient
                             b = Int32.TryParse(Console.ReadLine(), out prop);
                         } while (!b);
                         Console.Write("Enter the value: ");
-                        value = Console.ReadLine();
+                        value = Console.ReadLine(); 
                         cd.PrintLegend();
                         if (option == 1)
                         {
@@ -279,7 +290,7 @@ namespace ContactClient
                     catch (Exception e)
                     {
                         Console.WriteLine("Search operation failed!");
-                        cd.logger.Error(e.StackTrace);
+                        logger.Error(e.StackTrace);
                     }
                     break;
                 case "6": // show all contacts

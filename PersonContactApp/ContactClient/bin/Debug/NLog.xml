@@ -7664,13 +7664,6 @@
             </summary>
             <returns>The time the file was last opened.</returns>
         </member>
-        <member name="P:NLog.Internal.FileAppenders.BaseFileAppender.LastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in  
-            Coordinated Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
-        </member>
         <member name="P:NLog.Internal.FileAppenders.BaseFileAppender.CreateFileParameters">
             <summary>
             Gets the file creation parameters.
@@ -7700,13 +7693,6 @@
             </summary>
             <returns>The file creation time.</returns>
         </member>
-        <member name="M:NLog.Internal.FileAppenders.BaseFileAppender.GetFileLastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in Coordinated 
-            Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
-        </member>
         <member name="M:NLog.Internal.FileAppenders.BaseFileAppender.GetFileLength">
             <summary>
             Gets the length in bytes of the file associated with the appeander.
@@ -7723,17 +7709,6 @@
             Releases unmanaged and - optionally - managed resources.
             </summary>
             <param name="disposing">True to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-        </member>
-        <member name="M:NLog.Internal.FileAppenders.BaseFileAppender.FileTouched">
-            <summary>
-            Updates the last write time of the file.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.FileAppenders.BaseFileAppender.FileTouched(System.DateTime)">
-            <summary>
-            Updates the last write time of the file to the specified date.
-            </summary>
-            <param name="dateTime">Date and time when the last write occurred in UTC.</param>
         </member>
         <member name="M:NLog.Internal.FileAppenders.BaseFileAppender.CreateFileStream(System.Boolean)">
             <summary>
@@ -7805,13 +7780,6 @@
             Time [UTC] standard.
             </summary>
             <returns>The file creation time.</returns>
-        </member>
-        <member name="M:NLog.Internal.FileAppenders.CountingSingleProcessFileAppender.GetFileLastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in Coordinated 
-            Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
         </member>
         <member name="M:NLog.Internal.FileAppenders.CountingSingleProcessFileAppender.GetFileLength">
             <summary>
@@ -7927,6 +7895,14 @@
             Fluch all the allocated appenders. 
             </summary>
         </member>
+        <member name="M:NLog.Internal.FileAppenders.FileAppenderCache.GetFileLastWriteTimeUtc(System.String)">
+            <summary>
+            File Archive Logic uses the File-Creation-TimeStamp to detect if time to archive, and the File-LastWrite-Timestamp to name the archive-file.
+            </summary>
+            <remarks>
+            NLog always closes all relevant appenders during archive operation, so no need to lookup file-appender
+            </remarks>
+        </member>
         <member name="M:NLog.Internal.FileAppenders.FileAppenderCache.InvalidateAppender(System.String)">
             <summary>
             Closes the specified appender and removes it from the list. 
@@ -7986,11 +7962,6 @@
         <member name="P:NLog.Internal.FileAppenders.ICreateFileParameters.FileAttributes">
             <summary>
             Gets or sets the file attributes (Windows only).
-            </summary>
-        </member>
-        <member name="P:NLog.Internal.FileAppenders.ICreateFileParameters.CaptureLastWriteTime">
-            <summary>
-            Should we capture the last write time of a file?
             </summary>
         </member>
         <member name="P:NLog.Internal.FileAppenders.ICreateFileParameters.IsArchivingEnabled">
@@ -8055,13 +8026,6 @@
             Time [UTC] standard.
             </summary>
             <returns>The file creation time.</returns>
-        </member>
-        <member name="M:NLog.Internal.FileAppenders.MutexMultiProcessFileAppender.GetFileLastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in Coordinated 
-            Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
         </member>
         <member name="M:NLog.Internal.FileAppenders.MutexMultiProcessFileAppender.GetFileLength">
             <summary>
@@ -8144,13 +8108,6 @@
             </summary>
             <returns>The file creation time.</returns>
         </member>
-        <member name="M:NLog.Internal.FileAppenders.RetryingMultiProcessFileAppender.GetFileLastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in Coordinated 
-            Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
-        </member>
         <member name="M:NLog.Internal.FileAppenders.RetryingMultiProcessFileAppender.GetFileLength">
             <summary>
             Gets the length in bytes of the file associated with the appeander.
@@ -8208,13 +8165,6 @@
             Time [UTC] standard.
             </summary>
             <returns>The file creation time.</returns>
-        </member>
-        <member name="M:NLog.Internal.FileAppenders.SingleProcessFileAppender.GetFileLastWriteTimeUtc">
-            <summary>
-            Gets the last time the file associated with the appeander is written. The time returned is in Coordinated 
-            Universal Time [UTC] standard.
-            </summary>
-            <returns>The time the file was last written to.</returns>
         </member>
         <member name="M:NLog.Internal.FileAppenders.SingleProcessFileAppender.GetFileLength">
             <summary>
@@ -10395,6 +10345,12 @@
             <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
             <param name="logEvent">Logging event.</param>
         </member>
+        <member name="M:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer.GetAssembly">
+            <summary>
+            Gets the assembly specified by <see cref="P:NLog.LayoutRenderers.AssemblyVersionLayoutRenderer.Name"/>, or entry assembly otherwise
+            </summary>
+            <returns>Found assembly</returns>
+        </member>
         <member name="T:NLog.LayoutRenderers.AssemblyVersionType">
             <summary>
             Type of assembly version to retrieve.
@@ -11473,7 +11429,7 @@
         </member>
         <member name="T:NLog.LayoutRenderers.LongDateLayoutRenderer">
             <summary>
-            The date and time in a long, sortable format yyyy-MM-dd HH:mm:ss.mmm.
+            The date and time in a long, sortable format yyyy-MM-dd HH:mm:ss.ffff.
             </summary>
         </member>
         <member name="P:NLog.LayoutRenderers.LongDateLayoutRenderer.UniversalTime">
@@ -11484,7 +11440,7 @@
         </member>
         <member name="M:NLog.LayoutRenderers.LongDateLayoutRenderer.Append(System.Text.StringBuilder,NLog.LogEventInfo)">
             <summary>
-            Renders the date in the long format (yyyy-MM-dd HH:mm:ss.mmm) and appends it to the specified <see cref="T:System.Text.StringBuilder" />.
+            Renders the date in the long format (yyyy-MM-dd HH:mm:ss.ffff) and appends it to the specified <see cref="T:System.Text.StringBuilder" />.
             </summary>
             <param name="builder">The <see cref="T:System.Text.StringBuilder"/> to append the rendered data to.</param>
             <param name="logEvent">Logging event.</param>
@@ -14679,17 +14635,17 @@
             </summary>
         </member>
         <member name="T:NLog.Logger">
-            <summary>
-            Logging methods which only are executed when the DEBUG conditional compilation symbol is set.
-            </summary>
-            <remarks>
-            The DEBUG conditional compilation symbol is default enabled (only) in a debug build.
+             <content>
+             Logging methods which only are executed when the DEBUG conditional compilation symbol is set.
             
-            If the DEBUG conditional compilation symbol isn't set in the calling library, the compiler will remove all the invocations to these methods. 
-            This could lead to better performance. 
-            
-            See: https://msdn.microsoft.com/en-us/library/4xssyw96%28v=vs.90%29.aspx
-            </remarks>
+             Remarks:
+             The DEBUG conditional compilation symbol is default enabled (only) in a debug build.
+             
+             If the DEBUG conditional compilation symbol isn't set in the calling library, the compiler will remove all the invocations to these methods. 
+             This could lead to better performance. 
+             
+             See: https://msdn.microsoft.com/en-us/library/4xssyw96%28v=vs.90%29.aspx
+             </content>
             <summary>
             Provides logging interface and utility functions.
             </summary>
@@ -22449,11 +22405,6 @@
             </summary>
             <docgen category='Output Options' order='10' />
         </member>
-        <member name="P:NLog.Targets.FileTarget.NLog#Internal#FileAppenders#ICreateFileParameters#CaptureLastWriteTime">
-            <summary>
-            Should we capture the last write time of a file?
-            </summary>
-        </member>
         <member name="P:NLog.Targets.FileTarget.LineEnding">
             <summary>
             Gets or sets the line ending mode.
@@ -22485,6 +22436,13 @@
             <summary>
             Gets or sets the maximum number of seconds that files are kept open. If this number is negative the files are 
             not automatically closed after a period of inactivity.
+            </summary>
+            <docgen category='Performance Tuning Options' order='10' />
+        </member>
+        <member name="P:NLog.Targets.FileTarget.OpenFileFlushTimeout">
+            <summary>
+            Gets or sets the maximum number of seconds before open files are flushed. If this number is negative or zero
+            the files are not flushed by timer.
             </summary>
             <docgen category='Performance Tuning Options' order='10' />
         </member>
