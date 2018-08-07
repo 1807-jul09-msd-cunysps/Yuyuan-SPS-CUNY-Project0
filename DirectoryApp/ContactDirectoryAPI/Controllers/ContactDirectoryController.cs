@@ -44,13 +44,13 @@ namespace ContactDirectoryAPI.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(e.Message + e.StackTrace);
             }
         }
 
         [Route("contactdir/post/contactme")]
         [HttpPost]
-        public IHttpActionResult Post([FromBody]DbHandler.ContactMeMessage m) // POST: ContactDirectory/Post
+        public IHttpActionResult Post([FromBody]DbHandler.ContactMeMessage m)
         {
             try
             {

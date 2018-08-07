@@ -35,7 +35,7 @@ namespace DirectoryDAL
                 "insert into dbo.Email values (@Pid, @EmailAddress) " +
                 "set identity_insert dbo.Person off";
             Cmd.Parameters.Clear();
-            ArrayList data = new ArrayList()
+            ArrayList data = new ArrayList
             {
                 p.Pid, p.FirstName, p.LastName, p.Age, p.Gender.ToString(),
                 p.Address.HouseNum, p.Address.Street, p.Address.City, p.Address.State, p.Address.Country, p.Address.ZipCode,
@@ -90,9 +90,9 @@ namespace DirectoryDAL
             Cmd.CommandText = "insert into dbo.Person values (@FirstName, @LastName, @Age, @Gender) " +
                 "SELECT CAST(SCOPE_IDENTITY() AS INT)";
             Cmd.Parameters.Clear();
-            ArrayList data = new ArrayList()
+            ArrayList data = new ArrayList
             {
-                p.FirstName, p.LastName, p.Age, p.Gender.ToString(),
+                p.FirstName, p.LastName, p.Age, p.Gender.ToString()
             };
             for (int i = 1; i < 5; i++)
             {
@@ -128,7 +128,7 @@ namespace DirectoryDAL
                 "insert into dbo.Email values (@Pid, @EmailAddress)";
             Cmd.Parameters.Clear();
             Cmd.Parameters.AddWithValue(DbParamMap[0], p.Pid);
-            data = new ArrayList()
+            data = new ArrayList
             {
                 p.Address.HouseNum, p.Address.Street, p.Address.City, p.Address.State, p.Address.Country, p.Address.ZipCode,
                 p.Phone.CountryCode, p.Phone.Number, p.Phone.Ext, p.Email.EmailAddress

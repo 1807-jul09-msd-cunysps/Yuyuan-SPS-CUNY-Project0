@@ -12,7 +12,7 @@ namespace ContactDirectoryAPI
         protected void Application_Start()
         {
             // custom
-            GlobalConfiguration.Configuration.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
+            //GlobalConfiguration.Configuration.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
